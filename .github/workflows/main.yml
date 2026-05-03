@@ -1,0 +1,40 @@
+name: Build HD2312 Package
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: '选择分支进行编译'
+        required: true
+        default: 'istoreos-24.10'
+        type: choice
+        options:
+          - istoreos-24.10
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      - name: Install build dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential git subversion libncurses5-dev zlib1g-dev gawk flex bison unzip python3 rsync wget
+
+      - name: Setup feeds and compile package
+        run: |
+          ./scripts/feeds update -a
+          ./scripts/feeds install -a
+          echo "CONFIG_PACKAGE_kmod-dvb-hd2312=m" >> .config
+          make defconfig
+          make package/hd2312/compile V=s
+
+      - name: Upload compiled package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: HD2312-Package
+          path: bin/packages/x86_64/*/kmod-dvb-hd2312*.ipk
