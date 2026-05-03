@@ -25,13 +25,20 @@ jobs:
           sudo apt update
           sudo apt install -y build-essential git subversion libncurses5-dev zlib1g-dev gawk flex bison unzip python3 rsync wget
 
-      - name: Setup feeds and compile target for kernel
+      - name: Setup feeds and prepare kernel headers
         run: |
           ./scripts/feeds update -a
           ./scripts/feeds install -a
           echo "CONFIG_PACKAGE_kmod-dvb-hd2312=m" >> .config
           make defconfig
-          make target/linux/compile V=s
+          # 只编译内核模块所需的 headers 和基本工具，不编译整个内核
+          make tools/compile V=s
+          make toolchain/compile V=s
+
+      - name: Compile DVB core dependencies first
+        run: |
+          make package/kernel/linux/kmod-dvb-core/compile V=s || true
+          make package/kernel/linux/kmod-dvb-usb/compile V=s || true
 
       - name: Compile HD2312 package
         run: |
@@ -41,4 +48,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: HD2312-Package
-          path: bin/packages/x86_64/*/kmod-dvb-hd2312*.ipk
+          path: bin/packages/*/*/kmod-dvb-hd2312*.ipk
