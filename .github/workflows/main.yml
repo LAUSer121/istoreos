@@ -27,26 +27,22 @@ jobs:
 
       - name: Prepare DVB support and set target to x86_64
         run: |
-          # 下载必需的 DVB 内核配置和模块定义文件
           curl -L https://raw.githubusercontent.com/hanwckf/hd2312/master/openwrt/dvb-kconfig -o /tmp/dvb-kconfig
           curl -L https://raw.githubusercontent.com/hanwckf/hd2312/master/openwrt/dvb.mk -o /tmp/dvb.mk
-          # 将 DVB 配置追加到内核通用配置中
           cat /tmp/dvb-kconfig >> target/linux/generic/config-6.6
-          # 复制模块定义文件，使系统识别 kmod-dvb-usb 等包
           cp /tmp/dvb.mk package/kernel/linux/modules/
-          # 强制设置目标平台为 x86_64，并开启所有必需的组件
           echo "CONFIG_TARGET_x86=y" >> .config
           echo "CONFIG_TARGET_x86_64=y" >> .config
           echo "CONFIG_PACKAGE_kmod-dvb-hd2312=m" >> .config
           echo "CONFIG_PACKAGE_kmod-dvb-core=m" >> .config
           echo "CONFIG_PACKAGE_kmod-dvb-usb=m" >> .config
 
-      - name: Setup feeds and prepare kernel for x86_64
+      - name: Setup feeds and build toolchain
         run: |
           ./scripts/feeds update -a
           ./scripts/feeds install -a
           make defconfig
-          make target/linux/prepare V=s
+          make toolchain/compile V=s
 
       - name: Compile HD2312 package
         run: |
