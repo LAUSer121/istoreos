@@ -25,14 +25,14 @@ jobs:
           sudo apt update
           sudo apt install -y build-essential git subversion libncurses5-dev zlib1g-dev gawk flex bison unzip python3 rsync wget m4
 
-      - name: Setup feeds and prepare kernel
+      - name: Setup feeds and prepare kernel headers only
         run: |
           ./scripts/feeds update -a
           ./scripts/feeds install -a
           echo "CONFIG_PACKAGE_kmod-dvb-hd2312=m" >> .config
           make defconfig
-          # 这一步会让内核完成配置和模块准备
-          make target/linux/compile V=s
+          # 只准备好内核头文件和配置，不编译内核
+          make target/linux/prepare V=s
 
       - name: Compile HD2312 package
         run: |
