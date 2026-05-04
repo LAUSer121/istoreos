@@ -44,8 +44,13 @@ jobs:
           make defconfig
           make toolchain/compile V=s
 
-      - name: Compile HD2312 package
+      - name: Create missing kernel artifacts and compile drivers
         run: |
+          # 创建缺失的文件，绕开构建流程的盲区
+          mkdir -p build_dir/target-x86_64_musl/linux-x86_64/linux-6.6.127
+          touch build_dir/target-x86_64_musl/linux-x86_64/linux-6.6.127/modules.builtin
+          # 现在依次编译内核和HD2312驱动
+          make package/kernel/linux/compile V=s
           make package/hd2312/compile V=s
 
       - name: Upload compiled package artifact
