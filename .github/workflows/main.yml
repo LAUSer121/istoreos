@@ -44,13 +44,15 @@ jobs:
           make defconfig
           make toolchain/compile V=s
 
-      - name: Create missing kernel artifacts and compile drivers
+      - name: Build DVB core dependencies first
         run: |
-          # 创建缺失的文件，绕开构建流程的盲区
-          mkdir -p build_dir/target-x86_64_musl/linux-x86_64/linux-6.6.127
-          touch build_dir/target-x86_64_musl/linux-x86_64/linux-6.6.127/modules.builtin
-          # 现在依次编译内核和HD2312驱动
-          make package/kernel/linux/compile V=s
+          # 先编译 DVB 核心模块，它会强制生成内核 .config 等必要文件
+          make package/kernel/linux/kmod-dvb-core/compile V=s
+          make package/kernel/linux/kmod-dvb-usb/compile V=s
+
+      - name: Compile HD2312 package
+        run: |
+          # 最后编译我们的驱动
           make package/hd2312/compile V=s
 
       - name: Upload compiled package artifact
