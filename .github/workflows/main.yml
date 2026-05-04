@@ -25,13 +25,27 @@ jobs:
           sudo apt update
           sudo apt install -y build-essential git subversion libncurses5-dev zlib1g-dev gawk flex bison unzip python3 rsync wget m4
 
-      - name: Setup feeds and prepare kernel headers only
+      - name: Prepare DVB support and set target to x86_64
+        run: |
+          # 下载必需的 DVB 内核配置和模块定义文件
+          curl -L https://raw.githubusercontent.com/hanwckf/hd2312/master/openwrt/dvb-kconfig -o /tmp/dvb-kconfig
+          curl -L https://raw.githubusercontent.com/hanwckf/hd2312/master/openwrt/dvb.mk -o /tmp/dvb.mk
+          # 将 DVB 配置追加到内核通用配置中
+          cat /tmp/dvb-kconfig >> target/linux/generic/config-6.6
+          # 复制模块定义文件，使系统识别 kmod-dvb-usb 等包
+          cp /tmp/dvb.mk package/kernel/linux/modules/
+          # 强制设置目标平台为 x86_64，并开启所有必需的组件
+          echo "CONFIG_TARGET_x86=y" >> .config
+          echo "CONFIG_TARGET_x86_64=y" >> .config
+          echo "CONFIG_PACKAGE_kmod-dvb-hd2312=m" >> .config
+          echo "CONFIG_PACKAGE_kmod-dvb-core=m" >> .config
+          echo "CONFIG_PACKAGE_kmod-dvb-usb=m" >> .config
+
+      - name: Setup feeds and prepare kernel for x86_64
         run: |
           ./scripts/feeds update -a
           ./scripts/feeds install -a
-          echo "CONFIG_PACKAGE_kmod-dvb-hd2312=m" >> .config
           make defconfig
-          # 只准备好内核头文件和配置，不编译内核
           make target/linux/prepare V=s
 
       - name: Compile HD2312 package
@@ -42,4 +56,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: HD2312-Package
-          path: bin/packages/*/*/kmod-dvb-hd2312*.ipk
+          path: bin/packages/x86_64/*/kmod-dvb-hd2312*.ipk
