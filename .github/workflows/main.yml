@@ -44,9 +44,9 @@ jobs:
           make defconfig
           make toolchain/compile V=s
 
-      - name: Build entire kernel for x86_64
+      - name: Build entire kernel to resolve symbols
         run: |
-          # 完整的 x86_64 内核编译，会自动生成 modules.builtin
+          # 完整编译 x86_64 内核，生成 Module.symvers 和所有模块
           make target/linux/compile V=s
 
       - name: Compile HD2312 package
