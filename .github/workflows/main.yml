@@ -46,12 +46,11 @@ jobs:
 
       - name: Build entire kernel for x86_64
         run: |
-          # 这一步会生成所有我们需要的 .config, 头文件, Module.symvers 等
+          # 完整的 x86_64 内核编译，会自动生成 modules.builtin
           make target/linux/compile V=s
 
       - name: Compile HD2312 package
         run: |
-          # 内核准备好了，现在编译我们的驱动包
           make package/hd2312/compile V=s
 
       - name: Upload compiled package artifact
