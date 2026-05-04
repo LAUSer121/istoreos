@@ -44,15 +44,14 @@ jobs:
           make defconfig
           make toolchain/compile V=s
 
-      - name: Build DVB core dependencies first
+      - name: Build entire kernel for x86_64
         run: |
-          # 先编译 DVB 核心模块，它会强制生成内核 .config 等必要文件
-          make package/kernel/linux/kmod-dvb-core/compile V=s
-          make package/kernel/linux/kmod-dvb-usb/compile V=s
+          # 这一步会生成所有我们需要的 .config, 头文件, Module.symvers 等
+          make target/linux/compile V=s
 
       - name: Compile HD2312 package
         run: |
-          # 最后编译我们的驱动
+          # 内核准备好了，现在编译我们的驱动包
           make package/hd2312/compile V=s
 
       - name: Upload compiled package artifact
