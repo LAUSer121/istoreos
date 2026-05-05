@@ -48,12 +48,14 @@ jobs:
         run: |
           make target/linux/compile V=s
 
-      - name: Compile HD2312 package
+      - name: Compile and install HD2312 package
         run: |
-          make package/hd2312/compile V=s
+          make package/hd2312/install V=s
 
       - name: Upload compiled package artifact
         uses: actions/upload-artifact@v4
         with:
           name: HD2312-Package
-          path: bin/packages/x86_64/*/kmod-dvb-hd2312*.ipk
+          path: |
+            bin/packages/x86_64/base/kmod-dvb-hd2312*.ipk
+            bin/targets/x86/64/packages/kmod-dvb-hd2312*.ipk
