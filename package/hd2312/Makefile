@@ -1,6 +1,6 @@
 include $(TOPDIR)/rules.mk
 
-PKG_NAME:=kmod-dvb-hd2312
+PKG_NAME:=hd2312
 PKG_VERSION:=1.0
 PKG_RELEASE:=1
 PKG_LICENSE:=GPL-2.0
@@ -14,7 +14,7 @@ PKG_MIRROR_HASH:=skip
 include $(INCLUDE_DIR)/package.mk
 include $(INCLUDE_DIR)/kernel.mk
 
-define KernelPackage/dvb-hd2312
+define KernelPackage/hd2312
   SUBMENU:=Other modules
   TITLE:=HDIC HD2312 DTMB/DMB-TH USB adapter support
   DEPENDS:=+kmod-dvb-usb +kmod-dvb-core
@@ -31,4 +31,4 @@ define Build/Compile
 		modules
 endef
 
-$(eval $(call KernelPackage,dvb-hd2312))
+$(eval $(call KernelPackage,hd2312))
