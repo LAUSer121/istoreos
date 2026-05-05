@@ -56,6 +56,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: HD2312-Package
-          path: |
-            bin/packages/x86_64/base/kmod-dvb-hd2312*.ipk
-            bin/targets/x86/64/packages/kmod-dvb-hd2312*.ipk
+          path: bin/packages/x86_64/base/kmod-hd2312*.ipk
