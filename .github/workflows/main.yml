@@ -48,12 +48,14 @@ jobs:
         run: |
           make target/linux/compile V=s
 
-      - name: Compile and install HD2312 package
+      - name: Compile HD2312 module
         run: |
-          make package/hd2312/install V=s
+          make package/hd2312/compile V=s
+          mkdir -p output
+          find build_dir -name "hd2312.ko" -exec cp {} output/ \;
 
-      - name: Upload compiled package artifact
+      - name: Upload module artifact
         uses: actions/upload-artifact@v4
         with:
-          name: HD2312-Package
-          path: bin/packages/x86_64/base/kmod-hd2312*.ipk
+          name: HD2312-Module
+          path: output/hd2312.ko
