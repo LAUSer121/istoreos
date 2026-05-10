@@ -51,12 +51,15 @@ jobs:
       - name: Compile HD2312 module
         run: |
           make package/hd2312/compile V=s
-          # 创建输出目录
           mkdir -p output
-          # 从标准内核模块构建目录查找并复制文件
-          find build_dir/target-x86_64_musl -name "hd2312.ko" -exec cp -v {} output/ \;
-          # 列出output目录下的文件以供确认
-          ls -l output/
+          # 直接从内核模块的标准输出目录查找并复制
+          find build_dir/target-x86_64_musl/linux-x86_64 -name "hd2312.ko" -exec cp -v {} output/ \;
+          # 如果标准路径没找到，再全局搜索一次作为备用
+          if [ ! -f output/hd2312.ko ]; then
+            find build_dir -name "hd2312.ko" -exec cp -v {} output/ \;
+          fi
+          echo "=== Contents of output/ ==="
+          ls -lh output/
 
       - name: Upload module artifact
         uses: actions/upload-artifact@v4
